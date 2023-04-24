@@ -37,37 +37,37 @@ class Pandemic:
     average_days_in_hospital_not_icu: float
     average_days_in_hospital_icu: float
 
-    def infected_total(self,population) -> float:
+    def infected_total(self, population: int) -> float:
         return(self.infected_per_population * population)
     
-    def seek_healthcare_total(self,population) -> float:
+    def seek_healthcare_total(self, population: int) -> float:
         return(self.seek_healthcare_per_infected * self.infected_total(population))
     
-    def hospitalised_total(self,population) -> float:
+    def hospitalised_total(self, population: int) -> float:
         return(self.hospitalised_per_seek_healthcare * self.seek_healthcare_total(population))
     
-    def icu_cases_total(self,population) -> float:
+    def icu_cases_total(self, population: int) -> float:
         return(self.icu_case_per_hospitalised * self.hospitalised_total(population))
     
-    def ventilated_total(self,population) -> float:
+    def ventilated_total(self, population: int) -> float:
         return(self.ventilated_per_icu_case * self.icu_cases_total(population))
     
-    def deaths(self,population) -> float:
+    def deaths(self, population: int) -> float:
         return(self.fatality * self.infected_total(population))
 
-    def outpatient_visits(self,population) -> float:
+    def outpatient_visits(self, population: int) -> float:
         return(self.seek_healthcare_total(population) - self.hospitalised_total(population))
     
-    def non_icu_patient_days(self,population) -> float:
+    def non_icu_patient_days(self, population: int) -> float:
         return(self.hospitalised_total(population)* self.average_days_in_hospital_not_icu)
     
-    def non_mv_icu_patient_days(self,population) -> float:
+    def non_mv_icu_patient_days(self, population: int) -> float:
         return(self.icu_cases_total(population) * (1-self.ventilated_per_icu_case)* self.average_days_in_hospital_icu)
     
-    def mv_icu_patient_days(self,population) -> float:
+    def mv_icu_patient_days(self, population: int) -> float:
         return(self.ventilated_total(population) * self.average_days_in_hospital_icu)
     
-    def summary_of_contacts(self,population) -> List[]:
+    def summary_of_contacts(self, population: int) -> List[float]:
         list0=[self.hospitalised_total(population),
                self.outpatient_visits(population),
                self.non_icu_patient_days(population),
