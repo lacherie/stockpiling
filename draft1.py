@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Dict, List, Tuple
 
 
@@ -18,7 +18,7 @@ class Item:
     name: str
     single_price: float
     box: Box
-    accessories: List[Tuple["Item", int]] = []
+    accessories: List[Tuple["Item", int]] = field(default_factory=list)
 
     def total_price(self) -> float:
         subprices = [
@@ -81,26 +81,16 @@ class Pandemic:
     def mv_icu_patient_days(self, population: int) -> float:
         return self.ventilated_total(population) * self.average_days_in_hospital_icu
 
-    def summary_of_contacts(self, population: int) -> List[float]:
-        list0 = [
-            self.hospitalised_total(population),
-            self.outpatient_visits(population),
-            self.non_icu_patient_days(population),
-            self.non_mv_icu_patient_days(population),
-            self.mv_icu_patient_days(population),
-        ]
-        return list0
-
-    def dictionary_of_contacts(self, Profession, population) -> Dict["Profession", int]:
-        dictionary0 = {
-            self.hospitalised_total(population),
-            self.outpatient_visits(population),
-            self.non_icu_patient_days(population),
-            self.non_mv_icu_patient_days(population),
-            self.mv_icu_patient_days(population),
+    def dictionary_of_contacts(
+        self, professions: List["Profession"], population: int
+    ) -> Dict["Profession", int]:
+        return {
+            profession: profession.total_contacts(self, population)
+            for profession in professions
         }
 
 
+# {MD:400,RN:500,other profession:xxx,}
 @dataclass
 class Profession:
     name: str
@@ -113,9 +103,17 @@ class Profession:
     contacts_per_icu_patient_day: int = 0  # 0 for administrative
     contacts_per_mv_day: int = 0  # 0 for administrative
 
-    def total_contacts(self, Pandemic, population) -> int:
-        patient_contacts = Pandemic.summary_of_contacts(Pandemic, population)
-        profession_contacts = 0
+    def total_contacts(self, pandemic: Pandemic, population: int) -> int:
+        return (
+            pandemic.hospitalised_total(population) * self.contacts_per_hospitalised
+            + pandemic.outpatient_visits(population)
+            * self.contacts_per_outpatient_visit
+            + pandemic.non_icu_patient_days(population)
+            * self.contacts_per_non_icu_patient_day
+            + pandemic.non_mv_icu_patient_days(population)
+            * self.contacts_per_non_icu_patient_day
+            + pandemic.mv_icu_patient_days(population) * self.contacts_per_mv_day
+        )
 
 
 if __name__ == "__main__":
@@ -127,6 +125,8 @@ if __name__ == "__main__":
         icu_case_per_hospitalised=0.15,
         ventilated_per_icu_case=0.5,
         fatality=0.021,
+        average_days_in_hospital_not_icu=5,
+        average_days_in_hospital_icu=10,
     )
 
     md = Profession(
@@ -146,6 +146,9 @@ if __name__ == "__main__":
         contacts_per_icu_patient_day=24,
         contacts_per_mv_day=24,
     )
+
+    professions = [md, rn]
+    contacts = influenza1918.dictionary_of_contacts(professions, 1000000)
 
     papr = Item(
         name="PAPR",
