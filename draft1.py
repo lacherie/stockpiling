@@ -32,6 +32,7 @@ class Item:
 @dataclass(frozen=True)
 class Pandemic:
     name: str
+    duration_in_weeks: float
     infected_per_population: float
     seek_healthcare_per_infected: float
     hospitalised_per_seek_healthcare: float
@@ -83,14 +84,12 @@ class Pandemic:
 
     def dictionary_of_contacts(
         self, professions: List["Profession"], population: int
-    ) -> Dict["Profession", int]:
+    ) -> Dict[str, int]:
         return {
-            profession: profession.total_contacts(self, population)
-            for profession in professions
+            item.name: item.total_contacts(self, population) for item in professions
         }
 
 
-# {MD:400,RN:500,other profession:xxx,}
 @dataclass
 class Profession:
     name: str
@@ -104,6 +103,9 @@ class Profession:
     """0 for administrative"""
     contacts_per_mv_day: int = 0
     """0 for administrative"""
+    contacts_per_week: float = 80.0
+    """assuming 40 work hours and 2 contacts per hour"""
+    attrition_rate: float = 0.4
 
     def total_contacts(self, pandemic: Pandemic, population: int) -> int:
         return (
@@ -113,14 +115,37 @@ class Profession:
             + pandemic.non_icu_patient_days(population)
             * self.contacts_per_non_icu_patient_day
             + pandemic.non_mv_icu_patient_days(population)
-            * self.contacts_per_non_icu_patient_day
+            * self.contacts_per_icu_patient_day
             + pandemic.mv_icu_patient_days(population) * self.contacts_per_mv_day
         )
+
+    def number_of_profession_involved_in_pandemic(
+        self, pandemic: Pandemic, population: int
+    ) -> float:
+        return self.total_contacts(pandemic, population) / (
+            self.contacts_per_week
+            * pandemic.duration_in_weeks
+            * (1 - self.attrition_rate)
+        )
+
+
+@dataclass
+class Strategy:
+    name: str
+    n95_amount: int
+    elastomeric_amount: int
+    papr_amount: int
+
+    def acquisition_cost_of_respirators(
+        self, pandemic: Pandemic, population: int
+    ) -> float:
+        return
 
 
 if __name__ == "__main__":
     influenza1918 = Pandemic(
         name="Influenza 1918",
+        duration_in_weeks=12.0,
         infected_per_population=0.3,
         seek_healthcare_per_infected=0.5,
         hospitalised_per_seek_healthcare=0.22,
@@ -163,8 +188,8 @@ if __name__ == "__main__":
         contacts_per_hospitalised=1,
         contacts_per_outpatient_visit=0,
         contacts_per_non_icu_patient_day=1,
-        contacts_per_icu_patient_day=1,
-        contacts_per_mv_day=1,
+        contacts_per_icu_patient_day=2,
+        contacts_per_mv_day=2,
     )
     phlebotomists = Profession(name="Phlebotomists", contacts_per_non_icu_patient_day=1)
 
@@ -204,7 +229,16 @@ if __name__ == "__main__":
         administrative,
         escort,
     ]
+
     contacts = influenza1918.dictionary_of_contacts(professions, 1000000)
+    total_hcw_involved = sum(contacts.values()) / (
+        Profession.contacts_per_week
+        * influenza1918.duration_in_weeks
+        * (1 - Profession.attrition_rate)
+    )
+
+    mds_involved = md.number_of_profession_involved_in_pandemic(influenza1918, 1000000)
+    rns_involved = rn.number_of_profession_involved_in_pandemic(influenza1918, 1000000)
 
     papr = Item(
         name="PAPR",
@@ -258,4 +292,9 @@ if __name__ == "__main__":
 
 
 # print(papr.total_price(),elastomeric.total_price(),n95.total_price())
-print(influenza1918.deaths(1000000))
+# print(influenza1918.outpatient_visits(1000000))
+# print(sum(contacts.values()))
+# print(influenza1918.dictionary_of_contacts(professions, 1000000))
+print(total_hcw_involved)
+print(mds_involved)
+print(rns_involved)
