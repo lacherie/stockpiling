@@ -168,7 +168,7 @@ if __name__ == "__main__":
     )
     phlebotomists = Profession(name="Phlebotomists", contacts_per_non_icu_patient_day=1)
     housekeepers = Profession(name="Housekeepers",contacts_per_hospitalised=1, contacts_per_outpatient_visit=0, contacts_per_non_icu_patient_day=1,contacts_per_icu_patient_day=1, contacts_per_mv_day=1)
-    
+    other_hcw = Profession(name="Other HCW",contacts_per_hospitalised=0, contacts_per_outpatient_visit=1, contacts_per_non_icu_patient_day=1, contacts_per_icu_patient_day=1, contacts_per_mv_day=1)
 
 
     professions = [md, rn]
