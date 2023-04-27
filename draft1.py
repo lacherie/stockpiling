@@ -152,7 +152,7 @@ if __name__ == "__main__":
     resp_tech = Profession(
         name="Respiratory tech",
         contacts_per_hospitalised=3,
-        contacts_per_outpatient_visit=0
+        contacts_per_outpatient_visit=0,
         contacts_per_non_icu_patient_day=6,
         contacts_per_icu_patient_day=12,
         contacts_per_mv_day=6,
@@ -167,13 +167,43 @@ if __name__ == "__main__":
         contacts_per_mv_day=1,
     )
     phlebotomists = Profession(name="Phlebotomists", contacts_per_non_icu_patient_day=1)
-    housekeepers = Profession(name="Housekeepers",contacts_per_hospitalised=1, contacts_per_outpatient_visit=0, contacts_per_non_icu_patient_day=1,contacts_per_icu_patient_day=1, contacts_per_mv_day=1)
-    other_hcw = Profession(name="Other HCW",contacts_per_hospitalised=0, contacts_per_outpatient_visit=1, contacts_per_non_icu_patient_day=1, contacts_per_icu_patient_day=1, contacts_per_mv_day=1)
-    administrative = Profession(name="Administrative",contacts_per_hospitalised=2,contacts_per_outpatient_visit=1)
-    escort = Profession(name="Escort",contacts_per_hospitalised=1)
 
+    housekeepers = Profession(
+        name="Housekeepers",
+        contacts_per_hospitalised=1,
+        contacts_per_outpatient_visit=0,
+        contacts_per_non_icu_patient_day=1,
+        contacts_per_icu_patient_day=1,
+        contacts_per_mv_day=1,
+    )
 
-    professions = [md, rn, resp_tech,radiology_tech,phlebotomists,housekeepers,other_hcw,administrative,escort]
+    other_hcw = Profession(
+        name="Other HCW",
+        contacts_per_hospitalised=0,
+        contacts_per_outpatient_visit=1,
+        contacts_per_non_icu_patient_day=1,
+        contacts_per_icu_patient_day=1,
+        contacts_per_mv_day=1,
+    )
+    administrative = Profession(
+        name="Administrative",
+        contacts_per_hospitalised=2,
+        contacts_per_outpatient_visit=1,
+    )
+
+    escort = Profession(name="Escort", contacts_per_hospitalised=1)
+
+    professions = [
+        md,
+        rn,
+        resp_tech,
+        radiology_tech,
+        phlebotomists,
+        housekeepers,
+        other_hcw,
+        administrative,
+        escort,
+    ]
     contacts = influenza1918.dictionary_of_contacts(professions, 1000000)
 
     papr = Item(
