@@ -96,12 +96,14 @@ class Profession:
     name: str
     contacts_per_hospitalised: int = 0
     """0 for Other HCW, only input for Escort"""
-    contacts_per_outpatient_visit: int = 0  # 0 for resp tech, radio tech, housekeepers
-    contacts_per_non_icu_patient_day: int = (
-        0  # 0 for administrative, only input for phlebotomists
-    )
-    contacts_per_icu_patient_day: int = 0  # 0 for administrative
-    contacts_per_mv_day: int = 0  # 0 for administrative
+    contacts_per_outpatient_visit: int = 0
+    """0 for resp tech, radio tech, housekeepers"""
+    contacts_per_non_icu_patient_day: int = 0
+    """0 for administrative, only input for phlebotomists"""
+    contacts_per_icu_patient_day: int = 0
+    """0 for administrative"""
+    contacts_per_mv_day: int = 0
+    """0 for administrative"""
 
     def total_contacts(self, pandemic: Pandemic, population: int) -> int:
         return (
@@ -146,6 +148,18 @@ if __name__ == "__main__":
         contacts_per_icu_patient_day=24,
         contacts_per_mv_day=24,
     )
+
+    resp_tech = Profession(name="Respiratory tech", contacts_per_non_icu_patient_day=1)
+
+    radiology_tech = Profession(
+        name="Radiology tech",
+        contacts_per_hospitalised=1,
+        contacts_per_outpatient_visit=1,
+        contacts_per_non_icu_patient_day=1,
+        contacts_per_icu_patient_day=1,
+        contacts_per_mv_day=1,
+    )
+    phlebotomist = Profession(name="Phlebotomist", contacts_per_non_icu_patient_day=1)
 
     professions = [md, rn]
     contacts = influenza1918.dictionary_of_contacts(professions, 1000000)
