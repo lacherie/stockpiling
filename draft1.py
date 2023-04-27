@@ -149,17 +149,27 @@ if __name__ == "__main__":
         contacts_per_mv_day=24,
     )
 
-    resp_tech = Profession(name="Respiratory tech", contacts_per_non_icu_patient_day=1)
+    resp_tech = Profession(
+        name="Respiratory tech",
+        contacts_per_hospitalised=3,
+        contacts_per_outpatient_visit=0
+        contacts_per_non_icu_patient_day=6,
+        contacts_per_icu_patient_day=12,
+        contacts_per_mv_day=6,
+    )
 
     radiology_tech = Profession(
         name="Radiology tech",
         contacts_per_hospitalised=1,
-        contacts_per_outpatient_visit=1,
+        contacts_per_outpatient_visit=0,
         contacts_per_non_icu_patient_day=1,
         contacts_per_icu_patient_day=1,
         contacts_per_mv_day=1,
     )
-    phlebotomist = Profession(name="Phlebotomist", contacts_per_non_icu_patient_day=1)
+    phlebotomists = Profession(name="Phlebotomists", contacts_per_non_icu_patient_day=1)
+    housekeepers = Profession(name="Housekeepers",contacts_per_hospitalised=1, contacts_per_outpatient_visit=0, contacts_per_non_icu_patient_day=1,contacts_per_icu_patient_day=1, contacts_per_mv_day=1)
+    
+
 
     professions = [md, rn]
     contacts = influenza1918.dictionary_of_contacts(professions, 1000000)
